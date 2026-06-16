@@ -1,19 +1,34 @@
+function esc(value){return String(value??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
+function img(url){return `linear-gradient(180deg,rgba(13,7,16,.06),rgba(13,7,16,.78)),url('${url}')`;}
+function renderInvite(){
+  const c=window.INVITE_CONFIG;if(!c)return;
+  document.title=c.metaTitle||`${c.title} — Invite Web`;
+  document.body.dataset.date=c.dateISO;document.body.dataset.scale=(c.scale||[]).join(',');
+  Object.entries(c.theme||{}).forEach(([k,v])=>document.body.style.setProperty(k,v));
+  const app=document.getElementById('app');
+  app.innerHTML=`
+  <div class="aurora"></div><div class="noise"></div>
+  <header class="top"><div class="wrap nav"><div class="brand">Invite<span>Web</span></div><div class="navlinks"><a href="#story">История</a><a href="#media">Фото и музыка</a><a href="#rsvp">RSVP</a></div><a class="btn secondary" href="../../">На главный сайт</a></div></header>
+  <main>
+    <section class="hero"><div class="wrap heroGrid"><div class="reveal"><p class="kicker">${esc(c.kicker)}</p><h1 class="h1">${c.titleHtml}</h1><p class="lead">${esc(c.heroText)}</p><div class="heroActions"><a class="btn primary" href="#rsvp">Подтвердить участие</a><a class="btn secondary" href="#media">Смотреть атмосферу</a></div><div class="chips">${c.chips.map(x=>`<span>${esc(x)}</span>`).join('')}</div></div><div class="stage reveal"><div class="spark s1">✦</div><div class="spark s2">✧</div><div class="spark s3">✦</div><div class="seal">${c.seal}</div><div class="phone"><div class="screen"><p class="mini">${esc(c.phoneMini)}</p><h2>${c.phoneTitleHtml}</h2>${c.phoneCards.map(x=>`<div class="screenCard"><b>${esc(x.title)}</b>${esc(x.text)}</div>`).join('')}<div class="phoneButton">Я буду</div></div></div><div class="ticket"><h3>${esc(c.ticketTitle)}</h3><p>${esc(c.ticketText)}</p></div></div></div></section>
+    <section><div class="wrap glass reveal"><div class="title"><p class="kicker">countdown</p><h2>До события <span>осталось</span></h2></div><div class="count"><div><b id="days">00</b><span>дней</span></div><div><b id="hours">00</b><span>часов</span></div><div><b id="minutes">00</b><span>минут</span></div><div><b id="seconds">00</b><span>секунд</span></div></div></div></section>
+    <section id="story"><div class="wrap"><div class="title reveal"><p class="kicker">guest experience</p><h2>${c.storyTitleHtml}</h2></div><div class="grid3">${c.infoCards.map(card=>`<article class="card reveal"><div class="ico">${card.icon}</div><h3>${esc(card.title)}</h3><p>${esc(card.text)}</p></article>`).join('')}</div></div></section>
+    <section><div class="wrap glass split reveal"><div><p class="kicker">program</p><h2>${esc(c.programTitle)}</h2><p class="muted">${esc(c.programText)}</p></div><div class="timeline">${c.program.map(p=>`<div class="time"><b>${esc(p.time)}</b><p>${esc(p.text)}</p></div>`).join('')}</div></div></section>
+    <section><div class="wrap glass dress reveal"><div><p class="kicker">style</p><h2>${c.styleTitleHtml}</h2><p class="muted">${esc(c.styleText)}</p></div><div class="palette"><span class="color c1"></span><span class="color c2"></span><span class="color c3"></span><span class="color c4"></span><span class="color c5"></span></div></div></section>
+    <section id="media"><div class="wrap"><div class="photoIntro reveal"><div><p class="kicker">premium atmosphere</p><h2 class="h1" style="font-size:clamp(42px,7vw,86px)">${c.mediaTitleHtml}</h2><p class="lead">${esc(c.mediaText)}</p></div><div class="musicBox" id="musicBox"><div class="musicTop"><div><p class="kicker">event mood</p><h3>${esc(c.musicTitle)}</h3><p class="muted">${esc(c.musicText)}</p></div><button class="playBtn" id="playBtn" type="button">▶</button></div><div class="bars"><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div><div class="gallery reveal">${c.photos.map(p=>`<div class="photo" style="background-image:${img(p.url)}"><span>${esc(p.title)}</span></div>`).join('')}</div></div></section>
+    <section><div class="wrap"><div class="title reveal"><p class="kicker">premium blocks</p><h2>Блоки, которые делают <span>дороже</span></h2></div><div class="concierge">${c.blocks.map(b=>`<div class="miniCard reveal"><b>${esc(b.title)}</b><p>${esc(b.text)}</p></div>`).join('')}</div></div></section>
+    <section id="rsvp"><div class="wrap glass reveal"><div class="title"><p class="kicker">rsvp</p><h2>Подтвердите <span>участие</span></h2><p class="muted">Демо-форма показывает механику. Для реальных заказов подключается Яндекс Форма или таблица ответов.</p></div><form class="form" id="rsvpForm"><label>Ваше имя<input required name="name" placeholder="Например, Алексей"></label><label>Будете на событии?<select required name="attendance"><option value="">Выберите вариант</option><option>Да, буду</option><option>Пока не знаю</option><option>Не смогу</option></select></label><label>Сколько человек будет с вами?<input type="number" min="0" max="10" name="guests" placeholder="Например, 1"></label><label>Пожелания / еда / аллергии<textarea name="food" placeholder="Например: без рыбы, аллергия на орехи, без алкоголя"></textarea></label><label>Нужен ли трансфер?<select name="transfer"><option>Нет</option><option>Да</option><option>Пока не знаю</option></select></label><button class="btn primary" type="submit">Отправить ответ</button></form></div></section>
+    <section><div class="wrap glass qrWrap reveal"><div><p class="kicker">print ready</p><h2>QR для печати</h2><p class="muted">После публикации сайта сюда ставится настоящий QR-код. Его можно напечатать на открытке, табличке или отправить отдельным файлом.</p></div><div class="qr"><i></i><i></i><i></i><b>QR</b></div></div></section>
+  </main><footer>Invite Web · Premium online invitations</footer><div class="toast" id="toast">Спасибо! Ответ сохранён в демо-режиме.</div>`;
+}
+renderInvite();
 const ids=['days','hours','minutes','seconds'];
 const pad=v=>String(v).padStart(2,'0');
-function tick(){
-  const date=document.body.dataset.date||'2026-08-06T18:00:00+03:00';
-  const diff=new Date(date)-new Date();
-  let d=0,h=0,m=0,s=0;
-  if(diff>0){const t=Math.floor(diff/1000);d=Math.floor(t/86400);h=Math.floor(t/3600%24);m=Math.floor(t/60%60);s=t%60;}
-  [d,h,m,s].forEach((v,i)=>{const el=document.getElementById(ids[i]);if(el)el.textContent=pad(v);});
-}
+function tick(){const date=document.body.dataset.date||'2026-08-06T18:00:00+03:00';const diff=new Date(date)-new Date();let d=0,h=0,m=0,s=0;if(diff>0){const t=Math.floor(diff/1000);d=Math.floor(t/86400);h=Math.floor(t/3600%24);m=Math.floor(t/60%60);s=t%60}[d,h,m,s].forEach((v,i)=>{const el=document.getElementById(ids[i]);if(el)el.textContent=pad(v);});}
 tick();setInterval(tick,1000);
-const io=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('show')}),{threshold:.12});
-document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
-const form=document.getElementById('rsvpForm'),toast=document.getElementById('toast');
-if(form&&toast){form.addEventListener('submit',e=>{e.preventDefault();toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),3200);form.reset();});}
-let audioCtx=null,master=null,timer=null,playing=false;
-const box=document.getElementById('musicBox'),play=document.getElementById('playBtn');
+const io=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('show')}),{threshold:.12});document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+const form=document.getElementById('rsvpForm'),toast=document.getElementById('toast');if(form&&toast){form.addEventListener('submit',e=>{e.preventDefault();toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),3200);form.reset();});}
+let audioCtx=null,master=null,timer=null,playing=false;const box=document.getElementById('musicBox'),play=document.getElementById('playBtn');
 function note(freq,time,len,type='sine',gain=.055){const osc=audioCtx.createOscillator(),g=audioCtx.createGain();osc.type=type;osc.frequency.value=freq;g.gain.setValueAtTime(0,time);g.gain.linearRampToValueAtTime(gain,time+.02);g.gain.exponentialRampToValueAtTime(.001,time+len);osc.connect(g);g.connect(master);osc.start(time);osc.stop(time+len+.04)}
 function beat(){const now=audioCtx.currentTime;const scale=(document.body.dataset.scale||'261.63,329.63,392,493.88,392,329.63,293.66,392').split(',').map(Number);scale.forEach((f,i)=>{note(f,now+i*.22,.18,'triangle',.045);note(f/2,now+i*.44,.34,'sine',.032)});note(scale[0]/2,now,.42,'sawtooth',.022);note(scale[2]/2,now+.88,.42,'sawtooth',.022);note(scale[1]/2,now+1.76,.42,'sawtooth',.022)}
 if(play&&box){play.addEventListener('click',()=>{if(!audioCtx){audioCtx=new (window.AudioContext||window.webkitAudioContext)();master=audioCtx.createGain();master.gain.value=.42;master.connect(audioCtx.destination)}if(!playing){playing=true;box.classList.add('playing');play.textContent='Ⅱ';beat();timer=setInterval(beat,3520)}else{playing=false;box.classList.remove('playing');play.textContent='▶';clearInterval(timer)}});}
